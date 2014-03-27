@@ -317,6 +317,13 @@ $.fn.extend({
 						if (pos > test.length) {
 							break;
 						}
+					} else if (allow && i !== partialPosition) {
+						// pasting in a value will assume that formatting characters match
+						// (and insert them from existing in buffer).
+						// e.g. paste 12345678 into a field that has a mask of "99 99 99 99 99"
+						//   we want this to match through 8 characters that aren't placeholders;
+						//   not through 8 characters total.
+						lastMatch++;
 					} else if (buffer[i] === test.charAt(pos) && i !== partialPosition) {
 						pos++;
 						lastMatch++;
