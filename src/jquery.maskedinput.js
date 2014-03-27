@@ -23,7 +23,8 @@ $.mask = {
 	},
 	autoclear: true,
 	dataName: "rawMaskFn",
-	placeholder: '_'
+	placeholder: '_',
+	displayMask: true
 };
 
 $.fn.extend({
@@ -78,6 +79,7 @@ $.fn.extend({
 		settings = $.extend({
 			autoclear: $.mask.autoclear,
 			placeholder: $.mask.placeholder, // Load default placeholder
+			displayMask: $.mask.displayMask,
 			completed: null
 		}, settings);
 
@@ -210,22 +212,22 @@ $.fn.extend({
 					c,
 					next;
 
-                    if (k == 0) {
-                        // unable to detect key pressed. Grab it from pos and adjust
-                        // this is a failsafe for mobile chrome
-                        // which can't detect keypress events
-                        // reliably
-                        if (pos.begin >= len) {
-                            input.val(input.val().substr(0, len));
-                            e.preventDefault();
-                            return false;
-                        }
-                        if (pos.begin == pos.end) {
-                            k = input.val().charCodeAt(pos.begin - 1);
-                            pos.begin--;
-                            pos.end--;
-                        }
-                    }
+        if (k == 0) {
+            // unable to detect key pressed. Grab it from pos and adjust
+            // this is a failsafe for mobile chrome
+            // which can't detect keypress events
+            // reliably
+            if (pos.begin >= len) {
+                input.val(input.val().substr(0, len));
+                e.preventDefault();
+                return false;
+            }
+            if (pos.begin == pos.end) {
+                k = input.val().charCodeAt(pos.begin - 1);
+                pos.begin--;
+                pos.end--;
+            }
+        }
 
 				if (e.ctrlKey || e.altKey || e.metaKey || k < 32) {//Ignore
 					return;
@@ -275,12 +277,28 @@ $.fn.extend({
 				}
 			}
 
-			function writeBuffer() { input.val(buffer.join('')); }
+			function writeBuffer() {
+				var i, val = '';
+				if (settings.displayMask) {
+					input.val(buffer.join(''));
+				} else {
+					// NOTE: this only works if the placeholder value does not match
+					// 	the mask (e.g. if your placeholder is 9, it will match a test of *)
+					for (i = 0; i < buffer.length; i++) {
+						if (!tests[i] || tests[i].test(buffer[i])) {
+							val += buffer[i];
+						} else {
+							break;
+						}
+					}
+					input.val(val);
+				}
+			}
 
 			function checkVal(allow) {
 				//try to place characters where they belong
 				var test = input.val(),
-					lastMatch = -1,
+					lastMatch = 0,
 					i,
 					c,
 					pos;
@@ -292,7 +310,7 @@ $.fn.extend({
 							c = test.charAt(pos - 1);
 							if (tests[i].test(c)) {
 								buffer[i] = c;
-								lastMatch = i;
+								lastMatch++;
 								break;
 							}
 						}
@@ -301,12 +319,12 @@ $.fn.extend({
 						}
 					} else if (buffer[i] === test.charAt(pos) && i !== partialPosition) {
 						pos++;
-						lastMatch = i;
+						lastMatch++;
 					}
 				}
 				if (allow) {
 					writeBuffer();
-				} else if (lastMatch + 1 < partialPosition) {
+				} else if (lastMatch < partialPosition) {
 					if (settings.autoclear || buffer.join('') === defaultBuffer) {
 						// Invalid value. Remove it and replace it with the
 						// mask, which is the default behavior.
@@ -319,9 +337,9 @@ $.fn.extend({
 					}
 				} else {
 					writeBuffer();
-					input.val(input.val().substring(0, lastMatch + 1));
+					input.val(input.val().substring(0, lastMatch));
 				}
-				return (partialPosition ? i : firstNonMaskPos);
+				return (typeof(partialPosition) !== "undefined" ? lastMatch : firstNonMaskPos);
 			}
 
 			input.data($.mask.dataName,function(){
