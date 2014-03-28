@@ -298,7 +298,7 @@ $.fn.extend({
 			function checkVal(allow) {
 				//try to place characters where they belong
 				var test = input.val(),
-					lastMatch = 0,
+					lastMatch = -1,
 					i,
 					c,
 					pos;
@@ -310,7 +310,7 @@ $.fn.extend({
 							c = test.charAt(pos - 1);
 							if (tests[i].test(c)) {
 								buffer[i] = c;
-								lastMatch++;
+								lastMatch = i;
 								break;
 							}
 						}
@@ -323,15 +323,15 @@ $.fn.extend({
 						// e.g. paste 12345678 into a field that has a mask of "99 99 99 99 99"
 						//   we want this to match through 8 characters that aren't placeholders;
 						//   not through 8 characters total.
-						lastMatch++;
+						lastMatch = i;
 					} else if (buffer[i] === test.charAt(pos) && i !== partialPosition) {
 						pos++;
-						lastMatch++;
+						lastMatch = i;
 					}
 				}
 				if (allow) {
 					writeBuffer();
-				} else if (lastMatch < partialPosition) {
+				} else if (lastMatch + 1 < partialPosition) {
 					if (settings.autoclear || buffer.join('') === defaultBuffer) {
 						// Invalid value. Remove it and replace it with the
 						// mask, which is the default behavior.
@@ -344,9 +344,9 @@ $.fn.extend({
 					}
 				} else {
 					writeBuffer();
-					input.val(input.val().substring(0, lastMatch));
+					input.val(input.val().substring(0, lastMatch + 1));
 				}
-				return (typeof(partialPosition) !== "undefined" ? lastMatch : firstNonMaskPos);
+				return ((lastMatch >= 0) ? lastMatch + 1 : firstNonMaskPos);
 			}
 
 			input.data($.mask.dataName,function(){
