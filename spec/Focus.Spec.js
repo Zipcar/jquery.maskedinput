@@ -86,6 +86,24 @@ feature("Focusing A Masked Input",function(){
 			expect(caret.end).toEqual(2);
 		});
 	});
+
+	scenario("Masking an input with a hidden mask",function(){
+		given("a mask beginning with a literal",function(){
+			input.mask("99 99 99",{displayMask: false});
+		});
+		when("focusing",function(){
+			input.focus();
+		});
+		waits(20);
+		then("placeholder text should be blank",function(){
+			expect(input).toHaveValue('');
+		});
+		and("caret position should be correct",function(){
+			var caret=input.caret();
+			expect(caret.begin).toEqual(0);
+			expect(caret.end).toEqual(0);
+		});
+	});
 });
 
 feature("Leaving A Masked Input",function(){
