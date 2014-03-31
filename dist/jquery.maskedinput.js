@@ -142,19 +142,19 @@
                         return tests[i] && c != settings.placeholder ? c : null;
                     }).join("");
                 }), input.attr("readonly") || input.one("unmask", function() {
-                    input.off(".mask").removeData($.mask.dataName);
-                }).on("focus.mask", function() {
+                    input.unbind(".mask").removeData($.mask.dataName);
+                }).bind("focus.mask", function() {
                     clearTimeout(caretTimeoutId);
                     var pos;
                     focusText = input.val(), pos = checkVal(), caretTimeoutId = setTimeout(function() {
                         writeBuffer(), pos == mask.replace("?", "").length ? input.caret(0, pos) : input.caret(pos);
                     }, 10);
-                }).on("blur.mask", blurEvent).on("keydown.mask", keydownEvent).on("keypress.mask", keypressEvent).on(pasteEventName, function() {
+                }).bind("blur.mask", blurEvent).bind("keydown.mask", keydownEvent).bind("keypress.mask", keypressEvent).bind(pasteEventName, function() {
                     setTimeout(function() {
                         var pos = checkVal(!0);
                         input.caret(pos), settings.completed && pos == input.val().length && settings.completed.call(input);
                     }, 0);
-                }), chrome && android && input.on("keyup.mask", keypressEvent), checkVal();
+                }), chrome && android && input.bind("keyup.mask", keypressEvent), checkVal();
             }));
         }
     });
