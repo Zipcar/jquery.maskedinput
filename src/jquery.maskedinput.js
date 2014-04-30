@@ -24,7 +24,8 @@ $.mask = {
 	autoclear: true,
 	dataName: "rawMaskFn",
 	placeholder: '_',
-	displayMask: true
+	displayMask: true,
+	ignoreInputWhenFull: false
 };
 
 $.fn.extend({
@@ -80,6 +81,7 @@ $.fn.extend({
 			autoclear: $.mask.autoclear,
 			placeholder: $.mask.placeholder, // Load default placeholder
 			displayMask: $.mask.displayMask,
+			ignoreInputWhenFull: $.mask.ignoreInputWhenFull,
 			completed: null
 		}, settings);
 
@@ -177,6 +179,11 @@ $.fn.extend({
       }
 
 			function keydownEvent(e) {
+			    if (settings.ignoreInputWhenFull && (len === input.val().length)) {
+				// Ignore keypress, because field is full.
+				// Backspace and delete are handled below.
+			        e.preventDefault();
+			    }
 				var k = e.which,
 					pos,
 					begin,

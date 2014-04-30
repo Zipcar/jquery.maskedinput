@@ -19,7 +19,8 @@
         autoclear: !0,
         dataName: "rawMaskFn",
         placeholder: "_",
-        displayMask: !0
+        displayMask: !0,
+        ignoreInputWhenFull: !1
     }, $.fn.extend({
         caret: function(begin, end) {
             var range;
@@ -44,6 +45,7 @@
                 autoclear: $.mask.autoclear,
                 placeholder: $.mask.placeholder,
                 displayMask: $.mask.displayMask,
+                ignoreInputWhenFull: $.mask.ignoreInputWhenFull,
                 completed: null
             }, settings), defs = $.mask.definitions, tests = [], partialPosition = len = mask.length, 
             firstNonMaskPos = null, $.each(mask.split(""), function(i, c) {
@@ -79,6 +81,7 @@
                     checkVal(), input.val() != focusText && input.change();
                 }
                 function keydownEvent(e) {
+                    settings.ignoreInputWhenFull && len === input.val().length && e.preventDefault();
                     var pos, begin, end, k = e.which;
                     8 === k || 46 === k || iPhone && 127 === k ? (pos = input.caret(), begin = pos.begin, 
                     end = pos.end, end - begin === 0 && (begin = 46 !== k ? seekPrev(begin) : end = seekNext(begin - 1), 
