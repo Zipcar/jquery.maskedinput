@@ -81,8 +81,8 @@
                     checkVal(), input.val() != focusText && input.change();
                 }
                 function keydownEvent(e) {
-                    settings.ignoreInputWhenFull && len === input.val().length && e.preventDefault();
                     var pos, begin, end, k = e.which;
+                    settings.ignoreInputWhenFull && len === input.val().length && 37 !== k && 39 !== k && e.preventDefault(), 
                     8 === k || 46 === k || iPhone && 127 === k ? (pos = input.caret(), begin = pos.begin, 
                     end = pos.end, end - begin === 0 && (begin = 46 !== k ? seekPrev(begin) : end = seekNext(begin - 1), 
                     end = 46 === k ? seekNext(end) : end), clearBuffer(begin, end), shiftL(begin, end - 1), 

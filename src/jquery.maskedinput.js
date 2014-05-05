@@ -179,15 +179,20 @@ $.fn.extend({
       }
 
 			function keydownEvent(e) {
-			    if (settings.ignoreInputWhenFull && (len === input.val().length)) {
-				// Ignore keypress, because field is full.
-				// Backspace and delete are handled below.
-			        e.preventDefault();
-			    }
 				var k = e.which,
 					pos,
 					begin,
 					end;
+
+			    if (settings.ignoreInputWhenFull && (len === input.val().length)) {
+				// If it's not a left- or right-arrow key, 
+				// prevent the default behavior for that 
+				// keypress, because field is full.
+				// Backspace and delete are handled below.
+				if (k !== 37 && k !== 39) {
+				    e.preventDefault();
+				}
+			    }
 
 				//backspace, delete, and escape get special treatment
 				if (k === 8 || k === 46 || (iPhone && k === 127)) {
